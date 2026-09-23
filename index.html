@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Ukur Sipat Datar Pulang-Pergi - SMK Geomatika</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom scrollbar for tables */
+        .table-container { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f8fafc; }
+        .table-container::-webkit-scrollbar { height: 10px; width: 10px; }
+        .table-container::-webkit-scrollbar-track { background: #f8fafc; border-radius: 6px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 6px; }
+        
+        /* 4-Digit Input Styling */
+        .input-mm {
+            width: 100%; min-width: 55px; max-width: 70px;
+            text-align: center;
+            padding: 0.375rem 0.25rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        .input-mm:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+            z-index: 10;
+            position: relative;
+        }
+
+        /* Computed Cells Styling */
+        .calc-val { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; }
+        
+        /* Remove default number arrows */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-slate-900 text-white shadow-lg py-5 px-4 sticky top-0 z-50">
+        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-inner border border-blue-500">
+                    <svg class="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">Buku Ukur Sipat Datar Pulang-Pergi</h1>
+                    <p class="text-sm text-slate-400 font-medium tracking-wide">SMK Geomatika &bull; Auto-Tab Input (4 Digit Milimeter)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <div class="flex items-center bg-slate-800 rounded-lg p-1.5 border border-slate-700">
+                    <label class="text-xs font-bold text-slate-400 uppercase px-3">Elevasi Awal (m)</label>
+                    <input type="number" id="elevasi_awal" value="100.000" step="0.001" class="w-28 pl-3 pr-2 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-700 text-white font-bold text-base font-mono text-center">
+                </div>
+                <button onclick="hitungSemuaData()" class="bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-bold px-8 py-3 rounded-xl shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.23)] transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    HITUNG DATA
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 md:p-6 mx-auto w-full max-w-[1600px] space-y-8">
+        
+        <!-- RUTE PERGI -->
+        <section class="bg-white rounded-2xl shadow-sm border border-blue-200 overflow-hidden">
+            <div class="bg-blue-50 border-b border-blue-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-3 h-8 bg-blue-500 rounded-full inline-block"></span> Rute Pergi
+                </h2>
+                <button onclick="tambahBaris('pergi')" class="text-sm bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Slag Pergi
+                </button>
+            </div>
+            
+            <div class="table-container overflow-x-auto w-full pb-2">
+                <table class="w-full text-sm text-left whitespace-nowrap min-w-[1200px] border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-300 shadow-sm text-center">
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 w-12 text-slate-600">Slag</th>
+                            <th colspan="3" class="px-2 py-2 border-r border-slate-300 bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider">Bidikan Belakang (mm)</th>
+                            <th colspan="3" class="px-2 py-2 border-r border-slate-300 bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider">Bidikan Muka (mm)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-blue-50 text-blue-800 text-xs font-bold uppercase w-20 leading-tight">Jarak<br>Optis (m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold uppercase w-20 leading-tight">Δh<br>Hitung (m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-purple-50 text-purple-800 text-xs font-bold uppercase w-20 leading-tight">Koreksi<br>(m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold uppercase w-24 leading-tight">Δh<br>Definitif (m)</th>
+                            <th rowspan="2" class="px-3 py-3 border-r border-slate-300 bg-emerald-50 text-emerald-800 text-sm font-black uppercase w-28">Elevasi<br>(m)</th>
+                            <th rowspan="2" class="px-2 py-3 w-10">Aksi</th>
+                        </tr>
+                        <tr class="bg-slate-50 border-b border-slate-300 text-[11px] text-slate-600 font-bold uppercase text-center">
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-blue-50/50">BA</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-blue-50/50">BT</th>
+                            <th class="px-1 py-1.5 border-r border-slate-300 bg-blue-50/50">BB</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-amber-50/50">BA</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-amber-50/50">BT</th>
+                            <th class="px-1 py-1.5 border-r border-slate-300 bg-amber-50/50">BB</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-pergi" class="divide-y divide-slate-200 bg-white">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- RUTE PULANG -->
+        <section class="bg-white rounded-2xl shadow-sm border border-emerald-200 overflow-hidden">
+            <div class="bg-emerald-50 border-b border-emerald-200 px-6 py-4 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-3 h-8 bg-emerald-500 rounded-full inline-block"></span> Rute Pulang
+                </h2>
+                <button onclick="tambahBaris('pulang')" class="text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Slag Pulang
+                </button>
+            </div>
+            
+            <div class="table-container overflow-x-auto w-full pb-2">
+                <table class="w-full text-sm text-left whitespace-nowrap min-w-[1200px] border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-b border-slate-300 shadow-sm text-center">
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 w-12 text-slate-600">Slag</th>
+                            <th colspan="3" class="px-2 py-2 border-r border-slate-300 bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider">Bidikan Belakang (mm)</th>
+                            <th colspan="3" class="px-2 py-2 border-r border-slate-300 bg-slate-200 text-slate-800 font-bold text-xs uppercase tracking-wider">Bidikan Muka (mm)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-emerald-50 text-emerald-800 text-xs font-bold uppercase w-20 leading-tight">Jarak<br>Optis (m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold uppercase w-20 leading-tight">Δh<br>Hitung (m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-purple-50 text-purple-800 text-xs font-bold uppercase w-20 leading-tight">Koreksi<br>(m)</th>
+                            <th rowspan="2" class="px-2 py-3 border-r border-slate-300 bg-slate-50 text-slate-700 text-xs font-bold uppercase w-24 leading-tight">Δh<br>Definitif (m)</th>
+                            <th rowspan="2" class="px-3 py-3 border-r border-slate-300 bg-emerald-50 text-emerald-800 text-sm font-black uppercase w-28">Elevasi<br>(m)</th>
+                            <th rowspan="2" class="px-2 py-3 w-10">Aksi</th>
+                        </tr>
+                        <tr class="bg-slate-50 border-b border-slate-300 text-[11px] text-slate-600 font-bold uppercase text-center">
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-emerald-50/50">BA</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-emerald-50/50">BT</th>
+                            <th class="px-1 py-1.5 border-r border-slate-300 bg-emerald-50/50">BB</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-amber-50/50">BA</th>
+                            <th class="px-1 py-1.5 border-r border-slate-200 bg-amber-50/50">BT</th>
+                            <th class="px-1 py-1.5 border-r border-slate-300 bg-amber-50/50">BB</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-pulang" class="divide-y divide-slate-200 bg-white">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- REKAPITULASI -->
+        <section id="rekap_section" class="hidden opacity-0 transform translate-y-4 transition-all duration-700 ease-in-out">
+            <div class="bg-slate-800 rounded-2xl shadow-xl overflow-hidden border border-slate-700">
+                <div class="bg-slate-900 px-6 py-5 border-b border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-3 tracking-wide">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        REKAPITULASI HASIL KESELURUHAN
+                    </h2>
+                    <div id="status_toleransi" class="px-4 py-2 rounded-lg font-bold text-sm text-center border">
+                        <!-- Dynamic Status -->
+                    </div>
+                </div>
+                
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Stats Pergi -->
+                    <div class="bg-slate-700/50 p-5 rounded-xl border border-slate-600/50">
+                        <div class="text-blue-300 text-xs font-bold uppercase tracking-wider mb-3 border-b border-slate-600 pb-2">Data Rute Pergi</div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Total Slag:</span> <span id="r_slag_pergi" class="text-white font-mono font-bold">0</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Total Jarak:</span> <span class="text-white font-mono"><span id="r_jarak_pergi" class="font-bold">0</span> m</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Kesalahan (ΣΔh):</span> <span class="text-white font-mono"><span id="r_kesalahan_pergi" class="font-bold text-rose-400">0</span> m</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Elevasi Akhir:</span> <span class="text-white font-mono"><span id="r_elev_pergi" class="font-bold text-blue-400">0</span> m</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Pulang -->
+                    <div class="bg-slate-700/50 p-5 rounded-xl border border-slate-600/50">
+                        <div class="text-emerald-300 text-xs font-bold uppercase tracking-wider mb-3 border-b border-slate-600 pb-2">Data Rute Pulang</div>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Total Slag:</span> <span id="r_slag_pulang" class="text-white font-mono font-bold">0</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Total Jarak:</span> <span class="text-white font-mono"><span id="r_jarak_pulang" class="font-bold">0</span> m</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Kesalahan (ΣΔh):</span> <span class="text-white font-mono"><span id="r_kesalahan_pulang" class="font-bold text-rose-400">0</span> m</span></div>
+                            <div class="flex justify-between text-sm"><span class="text-slate-400">Elevasi Akhir:</span> <span class="text-white font-mono"><span id="r_elev_pulang" class="font-bold text-emerald-400">0</span> m</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Rata-rata Gabungan -->
+                    <div class="bg-slate-700/50 p-5 rounded-xl border border-slate-600/50">
+                        <div class="text-purple-300 text-xs font-bold uppercase tracking-wider mb-3 border-b border-slate-600 pb-2">Rata-Rata Pulang-Pergi</div>
+                        <div class="space-y-4">
+                            <div>
+                                <span class="block text-slate-400 text-xs mb-1">Rata-Rata Elevasi Akhir</span>
+                                <div class="text-2xl font-black text-white font-mono"><span id="r_rata_elevasi">0.000</span> <span class="text-sm font-normal text-slate-500">m</span></div>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400 text-xs mb-1">Rata-Rata Δh (Beda Tinggi)</span>
+                                <div class="text-2xl font-black text-white font-mono"><span id="r_rata_dh">0.000</span> <span class="text-sm font-normal text-slate-500">m</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kesalahan Penutup -->
+                    <div class="bg-indigo-900/40 p-5 rounded-xl border border-indigo-700/50 relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-500 rounded-bl-full -mr-4 -mt-4 opacity-10"></div>
+                        <div class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-3 border-b border-indigo-700/50 pb-2 relative z-10">Kesalahan Penutup Jarak</div>
+                        <div class="flex items-baseline gap-2 mb-2 relative z-10">
+                            <span id="r_kes_penutup" class="text-4xl font-black text-indigo-400 font-mono tracking-tight">0.0000</span>
+                        </div>
+                        <div class="text-[10px] text-indigo-300/60 leading-tight relative z-10">
+                            Rumus: Σ Slag / √(Σ Jarak Pergi + Σ Jarak Pulang)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Custom Toast Container -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-[100] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        // State Management
+        let dataPergi = [];
+        let dataPulang = [];
+        let globalIdCounter = 0;
+
+        function createRowObj() {
+            globalIdCounter++;
+            return {
+                id: globalIdCounter,
+                b_ba: '', b_bt: '', b_bb: '',
+                m_ba: '', m_bt: '', m_bb: '',
+                // Computed (meter)
+                jarak: null, dh: null, koreksi: null, dh_def: null, elevasi: null
+            };
+        }
+
+        function init() {
+            // Initial rows
+            for(let i=0; i<3; i++) dataPergi.push(createRowObj());
+            for(let i=0; i<3; i++) dataPulang.push(createRowObj());
+            renderTables();
+        }
+
+        function tambahBaris(rute) {
+            if (rute === 'pergi') dataPergi.push(createRowObj());
+            else dataPulang.push(createRowObj());
+            renderTables();
+            hideRecap();
+        }
+
+        function hapusBaris(rute, id) {
+            const arr = rute === 'pergi' ? dataPergi : dataPulang;
+            if (arr.length <= 1) {
+                showToast("Tabel minimal memiliki 1 baris (slag).", "error");
+                return;
+            }
+            if (rute === 'pergi') dataPergi = dataPergi.filter(r => r.id !== id);
+            else dataPulang = dataPulang.filter(r => r.id !== id);
+            renderTables();
+            hideRecap();
+        }
+
+        function hideRecap() {
+            const section = document.getElementById('rekap_section');
+            section.classList.add('opacity-0', 'translate-y-4');
+            setTimeout(() => { section.classList.add('hidden'); }, 300);
+        }
+
+        // Input Handler with Auto-Tab
+        function handleInput(rute, id, field, inputEl) {
+            hideRecap(); // Data changed, hide old results
+            
+            // Force numbers only
+            let val = inputEl.value.replace(/[^0-9]/g, '');
+            // Max 4 chars
+            val = val.substring(0, 4);
+            inputEl.value = val; 
+
+            // Update state
+            const arr = rute === 'pergi' ? dataPergi : dataPulang;
+            const idx = arr.findIndex(r => r.id === id);
+            if (idx !== -1) arr[idx][field] = val;
+
+            // Auto-Tab Logic
+            if (val.length === 4) {
+                // Find all auto-tab inputs sequentially
+                const inputs = Array.from(document.querySelectorAll('.auto-tab-input'));
+                const currentIndex = inputs.indexOf(inputEl);
+                if (currentIndex !== -1 && currentIndex < inputs.length - 1) {
+                    inputs[currentIndex + 1].focus();
+                    inputs[currentIndex + 1].select();
+                }
+            }
+        }
+
+        function hitungSemuaData() {
+            const elevAwalInput = document.getElementById('elevasi_awal').value;
+            if (!elevAwalInput) {
+                showToast("Harap isi Elevasi Awal!", "error");
+                return;
+            }
+            const elevasiAwal = parseFloat(elevAwalInput);
+
+            // Validation Helper
+            const isValidRow = (r) => (r.b_ba && r.b_bt && r.b_bb && r.m_ba && r.m_bt && r.m_bb);
+            
+            // Process Rute Pergi
+            let resPergi = processRute(dataPergi, elevasiAwal);
+            if (!resPergi.success) return; // Toast already shown inside processRute
+
+            // Process Rute Pulang (starts from final elevation of Pergi)
+            let resPulang = processRute(dataPulang, resPergi.finalElevasi);
+            if (!resPulang.success) return;
+
+            // Render tables to show computed values
+            renderTables();
+
+            // Populate Recapitulation
+            document.getElementById('r_slag_pergi').textContent = resPergi.totalSlag;
+            document.getElementById('r_jarak_pergi').textContent = resPergi.totalJarak.toFixed(2);
+            document.getElementById('r_kesalahan_pergi').textContent = resPergi.kesalahan.toFixed(4);
+            document.getElementById('r_elev_pergi').textContent = resPergi.finalElevasi.toFixed(3);
+
+            document.getElementById('r_slag_pulang').textContent = resPulang.totalSlag;
+            document.getElementById('r_jarak_pulang').textContent = resPulang.totalJarak.toFixed(2);
+            document.getElementById('r_kesalahan_pulang').textContent = resPulang.kesalahan.toFixed(4);
+            document.getElementById('r_elev_pulang').textContent = resPulang.finalElevasi.toFixed(3);
+
+            // Gabungan
+            const totalSlag = resPergi.totalSlag + resPulang.totalSlag;
+            const totalJarak = resPergi.totalJarak + resPulang.totalJarak;
+            
+            // Kesalahan Penutup Jarak = Sum Slag / SQRT(Sum Jarak Pergi + Sum Jarak Pulang)
+            const kesPenutupJarak = totalJarak > 0 ? (totalSlag / Math.sqrt(totalJarak)) : 0;
+            document.getElementById('r_kes_penutup').textContent = kesPenutupJarak.toFixed(4);
+
+            // Rata-rata Elevasi
+            const rataElevasi = (resPergi.finalElevasi + resPulang.finalElevasi) / 2;
+            document.getElementById('r_rata_elevasi').textContent = rataElevasi.toFixed(3);
+
+            // Rata-rata Beda Tinggi (Kesalahan/Sum Dh)
+            const rataDh = (resPergi.kesalahan + resPulang.kesalahan) / 2;
+            document.getElementById('r_rata_dh').textContent = rataDh.toFixed(4);
+
+            // Toleransi: Selisih Δh pergi dan pulang <= 0.003
+            // Since they are opposite directions, sum of errors should theoretically be near 0
+            const selisihDh = Math.abs(resPergi.kesalahan + resPulang.kesalahan);
+            
+            const badge = document.getElementById('status_toleransi');
+            if (selisihDh <= 0.003) {
+                badge.className = "px-4 py-2 rounded-lg font-bold text-sm text-center border bg-emerald-500/20 text-emerald-400 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.3)]";
+                badge.innerHTML = `TOLERANSI TERPENUHI (Selisih: ${selisihDh.toFixed(4)}m &le; 0.003m)`;
+            } else {
+                badge.className = "px-4 py-2 rounded-lg font-bold text-sm text-center border bg-rose-500/20 text-rose-400 border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.3)]";
+                badge.innerHTML = `DI LUAR TOLERANSI (Selisih: ${selisihDh.toFixed(4)}m &gt; 0.003m)`;
+            }
+
+            // Show Recap Section with animation
+            const section = document.getElementById('rekap_section');
+            section.classList.remove('hidden');
+            // Small delay for CSS transition to trigger
+            setTimeout(() => {
+                section.classList.remove('opacity-0', 'translate-y-4');
+            }, 50);
+
+            showToast("Perhitungan Selesai!", "success");
+        }
+
+        // Logic processing for a single route
+        function processRute(dataArray, startingElevasi) {
+            let sumJarak = 0;
+            let sumDh = 0;
+            let totalSlag = 0;
+
+            // Pass 1: Raw distances and delta h
+            for (let i = 0; i < dataArray.length; i++) {
+                const r = dataArray[i];
+                if (!r.b_ba || !r.b_bt || !r.b_bb || !r.m_ba || !r.m_bt || !r.m_bb) {
+                    showToast(`Terdapat data bacaan benang yang kosong pada baris ke-${i+1}.`, "error");
+                    return { success: false };
+                }
+                
+                // Parse strings to integers (milimeter)
+                const ba_b_mm = parseInt(r.b_ba, 10); const bt_b_mm = parseInt(r.b_bt, 10); const bb_b_mm = parseInt(r.b_bb, 10);
+                const ba_m_mm = parseInt(r.m_ba, 10); const bt_m_mm = parseInt(r.m_bt, 10); const bb_m_mm = parseInt(r.m_bb, 10);
+                
+                // Convert to meter
+                const ba_b = ba_b_mm/1000; const bt_b = bt_b_mm/1000; const bb_b = bb_b_mm/1000;
+                const ba_m = ba_m_mm/1000; const bt_m = bt_m_mm/1000; const bb_m = bb_m_mm/1000;
+
+                // Jarak = (BA - BB) * 100
+                const j_blk = (ba_b - bb_b) * 100;
+                const j_mk = (ba_m - bb_m) * 100;
+                
+                // Prevent negative distance from weird input
+                r.jarak = Math.max(0, j_blk) + Math.max(0, j_mk); 
+                
+                // Δh = BTB - BTM
+                r.dh = bt_b - bt_m;
+
+                sumJarak += r.jarak;
+                sumDh += r.dh;
+                totalSlag++;
+            }
+
+            // Kesalahan = Sum(Δh)
+            const kesalahan = sumDh;
+            
+            // Koreksi per slag = (Kesalahan / Sum Slag) * -1
+            const koreksiSlag = totalSlag > 0 ? (kesalahan / totalSlag) * -1 : 0;
+            
+            let currentElev = startingElevasi;
+
+            // Pass 2: Apply Koreksi and Elevasi
+            for (let i = 0; i < dataArray.length; i++) {
+                const r = dataArray[i];
+                r.koreksi = koreksiSlag;
+                r.dh_def = r.dh + r.koreksi;
+                
+                currentElev += r.dh_def;
+                r.elevasi = currentElev;
+            }
+
+            return {
+                success: true,
+                totalSlag: totalSlag,
+                totalJarak: sumJarak,
+                kesalahan: kesalahan,
+                finalElevasi: currentElev
+            };
+        }
+
+        // DOM Rendering
+        function renderTables() {
+            const tbodyPergi = document.getElementById('tbody-pergi');
+            const tbodyPulang = document.getElementById('tbody-pulang');
+            
+            tbodyPergi.innerHTML = '';
+            tbodyPulang.innerHTML = '';
+
+            dataPergi.forEach((r, i) => tbodyPergi.appendChild(createTrElement('pergi', r, i)));
+            dataPulang.forEach((r, i) => tbodyPulang.appendChild(createTrElement('pulang', r, i)));
+        }
+
+        function createTrElement(rute, r, index) {
+            const tr = document.createElement('tr');
+            tr.className = "text-center hover:bg-slate-50 transition-colors border-b border-slate-100";
+            
+            // Format functions for display
+            const fM = (val, d=3) => val !== null ? val.toFixed(d) : '-';
+            
+            // Inputs array structure
+            const fields = [
+                { f: 'b_ba', v: r.b_ba }, { f: 'b_bt', v: r.b_bt }, { f: 'b_bb', v: r.b_bb },
+                { f: 'm_ba', v: r.m_ba }, { f: 'm_bt', v: r.m_bt }, { f: 'm_bb', v: r.m_bb }
+            ];
+
+            let tdInputs = '';
+            fields.forEach(obj => {
+                tdInputs += `<td class="px-1 py-1.5 border-r border-slate-200">
+                    <input type="text" maxlength="4" value="${obj.v}" 
+                        oninput="handleInput('${rute}', ${r.id}, '${obj.f}', this)" 
+                        class="input-mm auto-tab-input" placeholder="0000">
+                </td>`;
+            });
+
+            tr.innerHTML = `
+                <td class="px-2 py-2 border-r border-slate-200 font-bold text-slate-500">${index + 1}</td>
+                ${tdInputs}
+                <td class="px-2 py-2 border-r border-slate-200 calc-val text-blue-700 font-bold bg-slate-50/50">${fM(r.jarak, 2)}</td>
+                <td class="px-2 py-2 border-r border-slate-200 calc-val ${r.dh < 0 ? 'text-rose-600' : 'text-slate-800'}">${fM(r.dh, 4)}</td>
+                <td class="px-2 py-2 border-r border-slate-200 calc-val text-purple-700 font-bold bg-purple-50/30">${fM(r.koreksi, 5)}</td>
+                <td class="px-2 py-2 border-r border-slate-200 calc-val ${r.dh_def < 0 ? 'text-rose-600' : 'text-slate-800'} font-bold">${fM(r.dh_def, 4)}</td>
+                <td class="px-2 py-2 border-r border-slate-200 calc-val text-emerald-700 font-bold bg-emerald-50/30 text-base">${fM(r.elevasi, 3)}</td>
+                <td class="px-1 py-2">
+                    <button onclick="hapusBaris('${rute}', ${r.id})" class="text-slate-400 hover:text-white hover:bg-rose-500 p-1.5 rounded-md transition-colors">
+                        <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </td>
+            `;
+            return tr;
+        }
+
+        // Custom Toast Notification System
+        function showToast(message, type = "info") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = "bg-slate-800";
+            let icon = '';
+            
+            if (type === "error") {
+                bgClass = "bg-rose-600";
+                icon = `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (type === "success") {
+                bgClass = "bg-emerald-600";
+                icon = `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            }
+
+            toast.className = `${bgClass} text-white px-5 py-3 rounded-xl shadow-xl flex items-center gap-3 transform transition-all duration-300 translate-x-full opacity-0 pointer-events-auto`;
+            toast.innerHTML = `${icon} <span class="font-medium">${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation in
+            setTimeout(() => { toast.classList.remove('translate-x-full', 'opacity-0'); }, 10);
+            
+            // Trigger animation out
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Boot
+        window.onload = init;
+    </script>
+</body>
+</html>
